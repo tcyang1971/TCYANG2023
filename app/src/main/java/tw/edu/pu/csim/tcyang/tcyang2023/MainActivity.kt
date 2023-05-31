@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -26,6 +27,10 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import tw.edu.pu.csim.tcyang.tcyang2023.ui.theme.TCYANG2023Theme
 
 class MainActivity : ComponentActivity() {
@@ -38,8 +43,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    //Greeting("Android")
-                    MapScreen()
+                    Greeting("Android")
+                    //MapScreen()
                 }
             }
         }
@@ -48,12 +53,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "JumpMap"){
+        composable("JumpMap"){
+            MapScreen(navController = navController)
+        }
+        composable("JumpCenter"){
+            CenterScreen(navController = navController)
+        }
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MapScreen() {
+fun MapScreen(navController: NavController) {
     var X = remember { mutableStateOf(0f) }
     var Y = remember { mutableStateOf(0f) }
     val context = LocalContext.current
@@ -85,8 +98,31 @@ fun MapScreen() {
         if (X.value>= 1610 && X.value<=1650 && Y.value>=910 && Y.value<=950){
             Toast.makeText(context, "清水南社社區", Toast.LENGTH_SHORT).show()
         }
+
+        if (X.value>=780 && X.value<=820 && Y.value>=200 && Y.value<=240){
+            navController.navigate("JumpCenter")
+        }
     }
 }
+
+@Composable
+fun CenterScreen(navController: NavController) {
+    Column(modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = {
+            navController.navigate("JumpMap")
+        }) {
+            Text(text = "返回主畫面")
+        }
+
+        Image(
+            painter = painterResource(id = R.drawable.center),
+            contentDescription = "港區藝術中心圖片")
+    }
+}
+
 
 
 @Preview(showBackground = true)
